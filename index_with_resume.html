@@ -1,0 +1,1043 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Perish Shack - Management Platform</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #DC143C;
+            --secondary-color: #2C2C2C;
+            --success-color: #28a745;
+            --error-color: #dc3545;
+            --warning-color: #ffc107;
+            --border-radius: 8px;
+            --transition: all 0.3s ease;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: linear-gradient(135deg, var(--secondary-color) 0%, #1a1a1a 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 16px;
+            color: #333;
+        }
+
+        .container {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            max-width: 600px;
+            width: 100%;
+            padding: 40px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .logo {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 0.95rem;
+        }
+
+        .login-form {
+            display: none;
+        }
+
+        .login-form.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--secondary-color);
+        }
+
+        input[type="email"],
+        input[type="text"],
+        input[type="number"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            font-family: inherit;
+            transition: var(--transition);
+        }
+
+        input[type="email"]:focus,
+        input[type="text"]:focus,
+        input[type="number"]:focus,
+        textarea:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(220, 20, 60, 0.1);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        button:hover {
+            background: #b91933;
+            transform: translateY(-2px);
+        }
+
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .secondary-button {
+            background: #666;
+            margin-top: 10px;
+        }
+
+        .secondary-button:hover {
+            background: #555;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #eee;
+            overflow-x: auto;
+        }
+
+        .tab-button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #999;
+            border-bottom: 3px solid transparent;
+            transition: var(--transition);
+            position: relative;
+            bottom: -2px;
+            white-space: nowrap;
+        }
+
+        .tab-button.active {
+            color: var(--primary-color);
+            border-bottom-color: var(--primary-color);
+        }
+
+        .tab-button:hover {
+            color: var(--primary-color);
+        }
+
+        .dashboard {
+            display: none;
+        }
+
+        .dashboard.active {
+            display: block;
+        }
+
+        .welcome-message {
+            background: #f0f8ff;
+            border-left: 4px solid var(--primary-color);
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+            font-size: 0.95rem;
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .form-section {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .form-section h3 {
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .question-group {
+            margin-bottom: 20px;
+        }
+
+        .question-label {
+            font-weight: 500;
+            margin-bottom: 10px;
+            color: var(--secondary-color);
+        }
+
+        .radio-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+        }
+
+        .radio-option {
+            display: flex;
+            align-items: center;
+        }
+
+        .radio-option input[type="radio"] {
+            margin-right: 8px;
+            cursor: pointer;
+        }
+
+        .radio-option label {
+            margin-bottom: 0;
+            cursor: pointer;
+            font-weight: normal;
+        }
+
+        .message {
+            padding: 12px;
+            border-radius: var(--border-radius);
+            margin-bottom: 20px;
+            display: none;
+            font-size: 0.95rem;
+        }
+
+        .message.success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+            display: block;
+        }
+
+        .message.error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+            display: block;
+        }
+
+        .message.info {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            color: #0c5460;
+            display: block;
+        }
+
+        .message.warning {
+            background: #fff3cd;
+            border: 1px solid #ffeeba;
+            color: #856404;
+            display: block;
+        }
+
+        .button-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .button-group button {
+            width: 100%;
+        }
+
+        .dashboard-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .report-button {
+            background: var(--success-color);
+            padding: 12px;
+            border-radius: var(--border-radius);
+            border: none;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .report-button:hover {
+            background: #218838;
+        }
+
+        .report-button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .progress-indicator {
+            font-size: 0.85rem;
+            color: #666;
+            margin-bottom: 15px;
+            padding: 10px;
+            background: #f9f9f9;
+            border-radius: 4px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: #ddd;
+            border-radius: 3px;
+            overflow: hidden;
+            margin-top: 5px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--primary-color);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">🔓 THE PERISH SHACK</div>
+            <div class="subtitle">Management Platform</div>
+        </div>
+
+        <!-- LOGIN FORM -->
+        <div class="login-form active" id="loginForm">
+            <div class="form-group">
+                <label for="email">Store Email</label>
+                <input type="email" id="email" placeholder="your@theperiperishack.com" required>
+            </div>
+            <div class="form-group">
+                <label for="code">Access Code</label>
+                <input type="text" id="code" placeholder="Enter your one-time code" required>
+            </div>
+            <button onclick="validateCode()">Access Platform</button>
+            <div id="loginMessage" class="message"></div>
+        </div>
+
+        <!-- DASHBOARD -->
+        <div class="dashboard" id="dashboard">
+            <div class="welcome-message">
+                <strong>✅ Welcome, <span id="employeeName"></span>!</strong>
+            </div>
+
+            <div class="tabs">
+                <button class="tab-button active" onclick="switchTab('evaluation')">Evaluation</button>
+                <button class="tab-button" onclick="switchTab('hours')">Hours Saved</button>
+                <button class="tab-button" onclick="switchTab('waste')">Waste Log</button>
+                <button class="tab-button" onclick="switchTab('reports')">Reports</button>
+                <button class="tab-button" onclick="switchTab('logout')">Logout</button>
+            </div>
+
+            <!-- EVALUATION TAB -->
+            <div id="evaluation" class="tab-content active">
+                <div id="evalMessage" class="message"></div>
+
+                <div class="progress-indicator">
+                    <div>Progress: <span id="progressText">0%</span></div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                    <small style="color: #999;">Your progress is auto-saved as you type</small>
+                </div>
+
+                <form id="evaluationForm" onsubmit="submitEvaluation(event)">
+
+                    <!-- JOB PERFORMANCE & PRODUCTIVITY -->
+                    <div class="form-section">
+                        <h3>Job Performance & Productivity</h3>
+
+                        <div class="question-group">
+                            <div class="question-label">Q1: Speed & Efficiency</div>
+                            <div class="radio-options">
+                                <div class="radio-option">
+                                    <input type="radio" name="q1" value="1" required onchange="autoSaveForm()">
+                                    <label>1 - Poor</label>
+                                </div>
+                                <div class="radio-option">
+                                    <input type="radio" name="q1" value="2" onchange="autoSaveForm()">
+                                    <label>2 - Needs Improvement</label>
+                                </div>
+                                <div class="radio-option">
+                                    <input type="radio" name="q1" value="3" onchange="autoSaveForm()">
+                                    <label>3 - Meets</label>
+                                </div>
+                                <div class="radio-option">
+                                    <input type="radio" name="q1" value="4" onchange="autoSaveForm()">
+                                    <label>4 - Exceeds</label>
+                                </div>
+                                <div class="radio-option">
+                                    <input type="radio" name="q1" value="5" onchange="autoSaveForm()">
+                                    <label>5 - Outstanding</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="question-group">
+                            <div class="question-label">Q2: Accuracy</div>
+                            <div class="radio-options">
+                                <div class="radio-option"><input type="radio" name="q2" value="1" required onchange="autoSaveForm()"><label>1 - Poor</label></div>
+                                <div class="radio-option"><input type="radio" name="q2" value="2" onchange="autoSaveForm()"><label>2 - Needs Improvement</label></div>
+                                <div class="radio-option"><input type="radio" name="q2" value="3" onchange="autoSaveForm()"><label>3 - Meets</label></div>
+                                <div class="radio-option"><input type="radio" name="q2" value="4" onchange="autoSaveForm()"><label>4 - Exceeds</label></div>
+                                <div class="radio-option"><input type="radio" name="q2" value="5" onchange="autoSaveForm()"><label>5 - Outstanding</label></div>
+                            </div>
+                        </div>
+
+                        <div class="question-group">
+                            <div class="question-label">Q3: Multitasking Ability & Sense of Urgency</div>
+                            <div class="radio-options">
+                                <div class="radio-option"><input type="radio" name="q3" value="1" required onchange="autoSaveForm()"><label>1 - Poor</label></div>
+                                <div class="radio-option"><input type="radio" name="q3" value="2" onchange="autoSaveForm()"><label>2 - Needs Improvement</label></div>
+                                <div class="radio-option"><input type="radio" name="q3" value="3" onchange="autoSaveForm()"><label>3 - Meets</label></div>
+                                <div class="radio-option"><input type="radio" name="q3" value="4" onchange="autoSaveForm()"><label>4 - Exceeds</label></div>
+                                <div class="radio-option"><input type="radio" name="q3" value="5" onchange="autoSaveForm()"><label>5 - Outstanding</label></div>
+                            </div>
+                        </div>
+
+                        <div class="question-group">
+                            <div class="question-label">Q4: Adherence to Standard Operating Procedures (SOPs)</div>
+                            <div class="radio-options">
+                                <div class="radio-option"><input type="radio" name="q4" value="1" required onchange="autoSaveForm()"><label>1 - Poor</label></div>
+                                <div class="radio-option"><input type="radio" name="q4" value="2" onchange="autoSaveForm()"><label>2 - Needs Improvement</label></div>
+                                <div class="radio-option"><input type="radio" name="q4" value="3" onchange="autoSaveForm()"><label>3 - Meets</label></div>
+                                <div class="radio-option"><input type="radio" name="q4" value="4" onchange="autoSaveForm()"><label>4 - Exceeds</label></div>
+                                <div class="radio-option"><input type="radio" name="q4" value="5" onchange="autoSaveForm()"><label>5 - Outstanding</label></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- CUSTOMER SERVICE & INTERACTION -->
+                    <div class="form-section">
+                        <h3>Customer Service & Interaction (FOH)</h3>
+
+                        <div class="question-group">
+                            <div class="question-label">Q5: Friendliness & Professionalism</div>
+                            <div class="radio-options">
+                                <div class="radio-option"><input type="radio" name="q5" value="1" required onchange="autoSaveForm()"><label>1 - Poor</label></div>
+                                <div class="radio-option"><input type="radio" name="q5" value="2" onchange="autoSaveForm()"><label>2 - Needs Improvement</label></div>
+                                <div class="radio-option"><input type="radio" name="q5" value="3" onchange="autoSaveForm()"><label>3 - Meets</label></div>
+                                <div class="radio-option"><input type="radio" name="q5" value="4" onchange="autoSaveForm()"><label>4 - Exceeds</label></div>
+                                <div class="radio-option"><input type="radio" name="q5" value="5" onchange="autoSaveForm()"><label>5 - Outstanding</label></div>
+                            </div>
+                        </div>
+
+                        <div class="question-group">
+                            <div class="question-label">Q6: Conflict Resolution Skills</div>
+                            <div class="radio-options">
+                                <div class="radio-option"><input type="radio" name="q6" value="1" required onchange="autoSaveForm()"><label>1 - Poor</label></div>
+                                <div class="radio-option"><input type="radio" name="q6" value="2" onchange="autoSaveForm()"><label>2 - Needs Improvement</label></div>
+                                <div class="radio-option"><input type="radio" name="q6" value="3" onchange="autoSaveForm()"><label>3 - Meets</label></div>
+                                <div class="radio-option"><input type="radio" name="q6" value="4" onchange="autoSaveForm()"><label>4 - Exceeds</label></div>
+                                <div class="radio-option"><input type="radio" name="q6" value="5" onchange="autoSaveForm()"><label>5 - Outstanding</label></div>
+                            </div>
+                        </div>
+
+                        <div class="question-group">
+                            <div class="question-label">Q7: Upselling and Suggestive Selling</div>
+                            <div class="radio-options">
+                                <div class="radio-option"><input type="radio" name="q7" value="1" required onchange="autoSaveForm()"><label>1 - Poor</label></div>
+                                <div class="radio-option"><input type="radio" name="q7" value="2" onchange="autoSaveForm()"><label>2 - Needs Improvement</label></div>
+                                <div class="radio-option"><input type="radio" name="q7" value="3" onchange="autoSaveForm()"><label>3 - Meets</label></div>
+                                <div class="radio-option"><input type="radio" name="q7" value="4" onchange="autoSaveForm()"><label>4 - Exceeds</label></div>
+                                <div class="radio-option"><input type="radio" name="q7" value="5" onchange="autoSaveForm()"><label>5 - Outstanding</label></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- TEAM WORK & COLLABORATION -->
+                    <div class="form-section">
+                        <h3>Team Work & Collaboration</h3>
+
+                        <div class="question-group">
+                            <div class="question-label">Q8: Cooperation with Team Members</div>
+                            <div class="radio-options">
+                                <div class="radio-option"><input type="radio" name="q8" value="1" required onchange="autoSaveForm()"><label>1 - Poor</label></div>
+                                <div class="radio-option"><input type="radio" name="q8" value="2" onchange="autoSaveForm()"><label>2 - Needs Improvement</label></div>
+                                <div class="radio-option"><input type="radio" name="q8" value="3" onchange="autoSaveForm()"><label>3 - Meets</label></div>
+                                <div class="radio-option"><input type="radio" name="q8" value="4" onchange="autoSaveForm()"><label>4 - Exceeds</label></div>
+                                <div class="radio-option"><input type="radio" name="q8" value="5" onchange="autoSaveForm()"><label>5 - Outstanding</label></div>
+                            </div>
+                        </div>
+
+                        <div class="question-group">
+                            <div class="question-label">Q9: Communication Skills</div>
+                            <div class="radio-options">
+                                <div class="radio-option"><input type="radio" name="q9" value="1" required onchange="autoSaveForm()"><label>1 - Poor</label></div>
+                                <div class="radio-option"><input type="radio" name="q9" value="2" onchange="autoSaveForm()"><label>2 - Needs Improvement</label></div>
+                                <div class="radio-option"><input type="radio" name="q9" value="3" onchange="autoSaveForm()"><label>3 - Meets</label></div>
+                                <div class="radio-option"><input type="radio" name="q9" value="4" onchange="autoSaveForm()"><label>4 - Exceeds</label></div>
+                                <div class="radio-option"><input type="radio" name="q9" value="5" onchange="autoSaveForm()"><label>5 - Outstanding</label></div>
+                            </div>
+                        </div>
+
+                        <div class="question-group">
+                            <div class="question-label">Q10: Dependability</div>
+                            <div class="radio-options">
+                                <div class="radio-option"><input type="radio" name="q10" value="1" required onchange="autoSaveForm()"><label>1 - Poor</label></div>
+                                <div class="radio-option"><input type="radio" name="q10" value="2" onchange="autoSaveForm()"><label>2 - Needs Improvement</label></div>
+                                <div class="radio-option"><input type="radio" name="q10" value="3" onchange="autoSaveForm()"><label>3 - Meets</label></div>
+                                <div class="radio-option"><input type="radio" name="q10" value="4" onchange="autoSaveForm()"><label>4 - Exceeds</label></div>
+                                <div class="radio-option"><input type="radio" name="q10" value="5" onchange="autoSaveForm()"><label>5 - Outstanding</label></div>
+                            </div>
+                        </div>
+
+                        <div class="question-group">
+                            <div class="question-label">Q11: Problem Solving Ability</div>
+                            <div class="radio-options">
+                                <div class="radio-option"><input type="radio" name="q11" value="1" required onchange="autoSaveForm()"><label>1 - Poor</label></div>
+                                <div class="radio-option"><input type="radio" name="q11" value="2" onchange="autoSaveForm()"><label>2 - Needs Improvement</label></div>
+                                <div class="radio-option"><input type="radio" name="q11" value="3" onchange="autoSaveForm()"><label>3 - Meets</label></div>
+                                <div class="radio-option"><input type="radio" name="q11" value="4" onchange="autoSaveForm()"><label>4 - Exceeds</label></div>
+                                <div class="radio-option"><input type="radio" name="q11" value="5" onchange="autoSaveForm()"><label>5 - Outstanding</label></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ATTENDANCE & PUNCTUALITY -->
+                    <div class="form-section">
+                        <h3>Attendance & Punctuality</h3>
+
+                        <div class="question-group">
+                            <div class="question-label">Q12: Scheduled Shifts</div>
+                            <div class="radio-options">
+                                <div class="radio-option"><input type="radio" name="q12" value="1" required onchange="autoSaveForm()"><label>1 - Poor</label></div>
+                                <div class="radio-option"><input type="radio" name="q12" value="2" onchange="autoSaveForm()"><label>2 - Needs Improvement</label></div>
+                                <div class="radio-option"><input type="radio" name="q12" value="3" onchange="autoSaveForm()"><label>3 - Meets</label></div>
+                                <div class="radio-option"><input type="radio" name="q12" value="4" onchange="autoSaveForm()"><label>4 - Exceeds</label></div>
+                                <div class="radio-option"><input type="radio" name="q12" value="5" onchange="autoSaveForm()"><label>5 - Outstanding</label></div>
+                            </div>
+                        </div>
+
+                        <div class="question-group">
+                            <div class="question-label">Q13: Break Management</div>
+                            <div class="radio-options">
+                                <div class="radio-option"><input type="radio" name="q13" value="1" required onchange="autoSaveForm()"><label>1 - Poor</label></div>
+                                <div class="radio-option"><input type="radio" name="q13" value="2" onchange="autoSaveForm()"><label>2 - Needs Improvement</label></div>
+                                <div class="radio-option"><input type="radio" name="q13" value="3" onchange="autoSaveForm()"><label>3 - Meets</label></div>
+                                <div class="radio-option"><input type="radio" name="q13" value="4" onchange="autoSaveForm()"><label>4 - Exceeds</label></div>
+                                <div class="radio-option"><input type="radio" name="q13" value="5" onchange="autoSaveForm()"><label>5 - Outstanding</label></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- COMPLIANCE & SAFETY -->
+                    <div class="form-section">
+                        <h3>Compliance & Safety Standards</h3>
+
+                        <div class="question-group">
+                            <div class="question-label">Q14: Food Safety & Hygiene</div>
+                            <div class="radio-options">
+                                <div class="radio-option"><input type="radio" name="q14" value="1" required onchange="autoSaveForm()"><label>1 - Poor</label></div>
+                                <div class="radio-option"><input type="radio" name="q14" value="2" onchange="autoSaveForm()"><label>2 - Needs Improvement</label></div>
+                                <div class="radio-option"><input type="radio" name="q14" value="3" onchange="autoSaveForm()"><label>3 - Meets</label></div>
+                                <div class="radio-option"><input type="radio" name="q14" value="4" onchange="autoSaveForm()"><label>4 - Exceeds</label></div>
+                                <div class="radio-option"><input type="radio" name="q14" value="5" onchange="autoSaveForm()"><label>5 - Outstanding</label></div>
+                            </div>
+                        </div>
+
+                        <div class="question-group">
+                            <div class="question-label">Q15: Adherence to Uniform</div>
+                            <div class="radio-options">
+                                <div class="radio-option"><input type="radio" name="q15" value="1" required onchange="autoSaveForm()"><label>1 - Poor</label></div>
+                                <div class="radio-option"><input type="radio" name="q15" value="2" onchange="autoSaveForm()"><label>2 - Needs Improvement</label></div>
+                                <div class="radio-option"><input type="radio" name="q15" value="3" onchange="autoSaveForm()"><label>3 - Meets</label></div>
+                                <div class="radio-option"><input type="radio" name="q15" value="4" onchange="autoSaveForm()"><label>4 - Exceeds</label></div>
+                                <div class="radio-option"><input type="radio" name="q15" value="5" onchange="autoSaveForm()"><label>5 - Outstanding</label></div>
+                            </div>
+                        </div>
+
+                        <div class="question-group">
+                            <div class="question-label">Q16: Workplace Safety Practices</div>
+                            <div class="radio-options">
+                                <div class="radio-option"><input type="radio" name="q16" value="1" required onchange="autoSaveForm()"><label>1 - Poor</label></div>
+                                <div class="radio-option"><input type="radio" name="q16" value="2" onchange="autoSaveForm()"><label>2 - Needs Improvement</label></div>
+                                <div class="radio-option"><input type="radio" name="q16" value="3" onchange="autoSaveForm()"><label>3 - Meets</label></div>
+                                <div class="radio-option"><input type="radio" name="q16" value="4" onchange="autoSaveForm()"><label>4 - Exceeds</label></div>
+                                <div class="radio-option"><input type="radio" name="q16" value="5" onchange="autoSaveForm()"><label>5 - Outstanding</label></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- WORK ETHIC & ATTITUDE -->
+                    <div class="form-section">
+                        <h3>Work Ethic & Attitude</h3>
+
+                        <div class="question-group">
+                            <div class="question-label">Q17: Initiative & Proactiveness</div>
+                            <div class="radio-options">
+                                <div class="radio-option"><input type="radio" name="q17" value="1" required onchange="autoSaveForm()"><label>1 - Poor</label></div>
+                                <div class="radio-option"><input type="radio" name="q17" value="2" onchange="autoSaveForm()"><label>2 - Needs Improvement</label></div>
+                                <div class="radio-option"><input type="radio" name="q17" value="3" onchange="autoSaveForm()"><label>3 - Meets</label></div>
+                                <div class="radio-option"><input type="radio" name="q17" value="4" onchange="autoSaveForm()"><label>4 - Exceeds</label></div>
+                                <div class="radio-option"><input type="radio" name="q17" value="5" onchange="autoSaveForm()"><label>5 - Outstanding</label></div>
+                            </div>
+                        </div>
+
+                        <div class="question-group">
+                            <div class="question-label">Q18: Adaptability and Learning Attitude</div>
+                            <div class="radio-options">
+                                <div class="radio-option"><input type="radio" name="q18" value="1" required onchange="autoSaveForm()"><label>1 - Poor</label></div>
+                                <div class="radio-option"><input type="radio" name="q18" value="2" onchange="autoSaveForm()"><label>2 - Needs Improvement</label></div>
+                                <div class="radio-option"><input type="radio" name="q18" value="3" onchange="autoSaveForm()"><label>3 - Meets</label></div>
+                                <div class="radio-option"><input type="radio" name="q18" value="4" onchange="autoSaveForm()"><label>4 - Exceeds</label></div>
+                                <div class="radio-option"><input type="radio" name="q18" value="5" onchange="autoSaveForm()"><label>5 - Outstanding</label></div>
+                            </div>
+                        </div>
+
+                        <div class="question-group">
+                            <div class="question-label">Q19: Respect for Authority</div>
+                            <div class="radio-options">
+                                <div class="radio-option"><input type="radio" name="q19" value="1" required onchange="autoSaveForm()"><label>1 - Poor</label></div>
+                                <div class="radio-option"><input type="radio" name="q19" value="2" onchange="autoSaveForm()"><label>2 - Needs Improvement</label></div>
+                                <div class="radio-option"><input type="radio" name="q19" value="3" onchange="autoSaveForm()"><label>3 - Meets</label></div>
+                                <div class="radio-option"><input type="radio" name="q19" value="4" onchange="autoSaveForm()"><label>4 - Exceeds</label></div>
+                                <div class="radio-option"><input type="radio" name="q19" value="5" onchange="autoSaveForm()"><label>5 - Outstanding</label></div>
+                            </div>
+                        </div>
+
+                        <div class="question-group">
+                            <div class="question-label">Q20: Improvement over Time</div>
+                            <div class="radio-options">
+                                <div class="radio-option"><input type="radio" name="q20" value="1" required onchange="autoSaveForm()"><label>1 - Poor</label></div>
+                                <div class="radio-option"><input type="radio" name="q20" value="2" onchange="autoSaveForm()"><label>2 - Needs Improvement</label></div>
+                                <div class="radio-option"><input type="radio" name="q20" value="3" onchange="autoSaveForm()"><label>3 - Meets</label></div>
+                                <div class="radio-option"><input type="radio" name="q20" value="4" onchange="autoSaveForm()"><label>4 - Exceeds</label></div>
+                                <div class="radio-option"><input type="radio" name="q20" value="5" onchange="autoSaveForm()"><label>5 - Outstanding</label></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- COMMENTS -->
+                    <div class="form-section">
+                        <div class="question-group">
+                            <label for="comments">Additional Comments</label>
+                            <textarea id="comments" name="comments" placeholder="Any additional feedback or observations..." onchange="autoSaveForm()"></textarea>
+                        </div>
+                    </div>
+
+                    <button type="submit">Submit Evaluation</button>
+                </form>
+            </div>
+
+            <!-- HOURS SAVED TAB -->
+            <div id="hours" class="tab-content">
+                <div id="hoursMessage" class="message"></div>
+                <form id="hoursForm" onsubmit="submitHours(event)">
+                    <div class="form-group">
+                        <label for="hoursLocation">Location</label>
+                        <select id="hoursLocation" required>
+                            <option value="">Select Location</option>
+                            <option value="Burnaby">Burnaby</option>
+                            <option value="Downtown">Downtown</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="hoursStaff">Staff Member Name</label>
+                        <input type="text" id="hoursStaff" placeholder="Employee name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="hoursValue">Hours Saved</label>
+                        <input type="number" id="hoursValue" placeholder="e.g. 2.5" step="0.5" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="hoursReason">Reason</label>
+                        <select id="hoursReason" required>
+                            <option value="">Select Reason</option>
+                            <option value="Business Slow">Business Slow</option>
+                            <option value="Staff Request">Staff Request</option>
+                            <option value="Manager Request">Manager Request</option>
+                            <option value="Absence Avoided">Absence Avoided</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="hoursNotes">Notes</label>
+                        <textarea id="hoursNotes" placeholder="Additional context..."></textarea>
+                    </div>
+                    <button type="submit">Log Hours Saved</button>
+                </form>
+            </div>
+
+            <!-- WASTE LOG TAB -->
+            <div id="waste" class="tab-content">
+                <div id="wasteMessage" class="message"></div>
+                <form id="wasteForm" onsubmit="submitWaste(event)">
+                    <div class="form-group">
+                        <label for="wasteLocation">Location</label>
+                        <select id="wasteLocation" required>
+                            <option value="">Select Location</option>
+                            <option value="Burnaby">Burnaby</option>
+                            <option value="Downtown">Downtown</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="wasteCategory">Category</label>
+                        <select id="wasteCategory" required>
+                            <option value="">Select Category</option>
+                            <option value="Prep Waste">Prep Waste</option>
+                            <option value="Spoilage">Spoilage</option>
+                            <option value="Over-portions">Over-portions</option>
+                            <option value="Spillage">Spillage</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="wasteQuantity">Quantity (lbs)</label>
+                        <input type="number" id="wasteQuantity" placeholder="e.g. 2.5" step="0.1" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="wasteNotes">Notes / Description</label>
+                        <textarea id="wasteNotes" placeholder="What happened..."></textarea>
+                    </div>
+                    <button type="submit">Log Waste</button>
+                </form>
+            </div>
+
+            <!-- REPORTS TAB -->
+            <div id="reports" class="tab-content">
+                <div id="reportsMessage" class="message"></div>
+                <div class="form-section">
+                    <h3>📊 Generate & Email Evaluations Report</h3>
+                    <p style="color: #666; font-size: 0.95rem; margin-bottom: 15px;">
+                        Generate a comprehensive PDF report of all evaluations and email it to <strong><span id="reportEmail"></span></strong>
+                    </p>
+                    <button type="button" class="report-button" onclick="generateAndEmailReport()" id="reportBtn">
+                        📄 Generate & Email Report
+                    </button>
+                    <small style="color: #999; display: block; margin-top: 10px;">
+                        Report will be sent as PDF attachment(s) to your email address
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // CONFIGURATION - Update these with your values
+        const APPS_SCRIPT_URL = "https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/usercallback";
+
+        // Global state
+        let userEmail = "";
+        let userName = "";
+
+        // Load saved form data on page load
+        window.addEventListener('load', loadFormData);
+
+        // CODE VALIDATION
+        async function validateCode() {
+            const email = document.getElementById("email").value;
+            const code = document.getElementById("code").value;
+            const messageEl = document.getElementById("loginMessage");
+
+            if (!email || !code) {
+                showMessage(messageEl, "Please enter both email and code", "error");
+                return;
+            }
+
+            try {
+                const response = await fetch(APPS_SCRIPT_URL, {
+                    method: "POST",
+                    body: new URLSearchParams({
+                        action: "validateCode",
+                        email: email,
+                        code: code
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    userEmail = email;
+                    userName = data.employeeName;
+                    document.getElementById("employeeName").textContent = userName;
+                    document.getElementById("reportEmail").textContent = userEmail;
+                    document.getElementById("loginForm").classList.remove("active");
+                    document.getElementById("dashboard").classList.add("active");
+                    loadFormData(); // Load any saved form data
+                } else {
+                    showMessage(messageEl, data.message, "error");
+                }
+            } catch (error) {
+                showMessage(messageEl, "Connection error: " + error.message, "error");
+            }
+        }
+
+        // AUTO-SAVE FORM DATA TO LOCALSTORAGE
+        function autoSaveForm() {
+            const form = document.getElementById("evaluationForm");
+            const formData = new FormData(form);
+            const data = {};
+
+            formData.forEach((value, key) => {
+                data[key] = value;
+            });
+
+            localStorage.setItem("evalFormData", JSON.stringify(data));
+            updateProgress();
+        }
+
+        // LOAD SAVED FORM DATA
+        function loadFormData() {
+            const savedData = localStorage.getItem("evalFormData");
+            if (savedData) {
+                const data = JSON.parse(savedData);
+                for (const [key, value] of Object.entries(data)) {
+                    const element = document.querySelector(`[name="${key}"]`);
+                    if (element) {
+                        if (element.type === "radio") {
+                            document.querySelector(`[name="${key}"][value="${value}"]`).checked = true;
+                        } else if (element.type === "textarea") {
+                            element.value = value;
+                        } else {
+                            element.value = value;
+                        }
+                    }
+                }
+                updateProgress();
+            }
+        }
+
+        // UPDATE PROGRESS INDICATOR
+        function updateProgress() {
+            let answered = 0;
+            for (let i = 1; i <= 20; i++) {
+                if (document.querySelector(`[name="q${i}"]:checked`)) {
+                    answered++;
+                }
+            }
+            const progress = Math.round((answered / 20) * 100);
+            document.getElementById("progressFill").style.width = progress + "%";
+            document.getElementById("progressText").textContent = progress + "%";
+        }
+
+        // EVALUATION SUBMISSION
+        async function submitEvaluation(event) {
+            event.preventDefault();
+            const messageEl = document.getElementById("evalMessage");
+            const form = document.getElementById("evaluationForm");
+
+            try {
+                const formData = new FormData(form);
+                const params = new URLSearchParams({
+                    action: "submitEvaluation",
+                    email: userEmail,
+                    employeeName: userName,
+                    timestamp: new Date().toLocaleString(),
+                    comments: formData.get("comments") || ""
+                });
+
+                for (let i = 1; i <= 20; i++) {
+                    const value = formData.get(`q${i}`);
+                    params.append(`q${i}`, value || "");
+                }
+
+                const response = await fetch(APPS_SCRIPT_URL, {
+                    method: "POST",
+                    body: params
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showMessage(messageEl, "✅ Evaluation submitted successfully!", "success");
+                    form.reset();
+                    localStorage.removeItem("evalFormData"); // Clear saved data after submission
+                    updateProgress();
+                    setTimeout(() => messageEl.classList.remove("message"), 3000);
+                } else {
+                    showMessage(messageEl, data.message, "error");
+                }
+            } catch (error) {
+                showMessage(messageEl, "Error: " + error.message, "error");
+            }
+        }
+
+        // GENERATE AND EMAIL REPORT
+        async function generateAndEmailReport() {
+            const messageEl = document.getElementById("reportsMessage");
+            const btn = document.getElementById("reportBtn");
+
+            btn.disabled = true;
+            showMessage(messageEl, "⏳ Generating report... this may take a moment", "info");
+
+            try {
+                const response = await fetch(APPS_SCRIPT_URL, {
+                    method: "POST",
+                    body: new URLSearchParams({
+                        action: "generateAndEmailReport",
+                        email: userEmail,
+                        userName: userName
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showMessage(messageEl, "✅ " + data.message, "success");
+                } else {
+                    showMessage(messageEl, "❌ " + data.message, "error");
+                }
+            } catch (error) {
+                showMessage(messageEl, "Error: " + error.message, "error");
+            } finally {
+                btn.disabled = false;
+            }
+        }
+
+        // HOURS SAVED SUBMISSION
+        async function submitHours(event) {
+            event.preventDefault();
+            const messageEl = document.getElementById("hoursMessage");
+
+            try {
+                const params = new URLSearchParams({
+                    action: "submitHoursSaved",
+                    location: document.getElementById("hoursLocation").value,
+                    staffName: document.getElementById("hoursStaff").value,
+                    hours: document.getElementById("hoursValue").value,
+                    reason: document.getElementById("hoursReason").value,
+                    notes: document.getElementById("hoursNotes").value,
+                    loggedBy: userName
+                });
+
+                const response = await fetch(APPS_SCRIPT_URL, {
+                    method: "POST",
+                    body: params
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showMessage(messageEl, "✅ Hours logged successfully!", "success");
+                    document.getElementById("hoursForm").reset();
+                    setTimeout(() => messageEl.classList.remove("message"), 3000);
+                } else {
+                    showMessage(messageEl, data.message, "error");
+                }
+            } catch (error) {
+                showMessage(messageEl, "Error: " + error.message, "error");
+            }
+        }
+
+        // WASTE LOG SUBMISSION
+        async function submitWaste(event) {
+            event.preventDefault();
+            const messageEl = document.getElementById("wasteMessage");
+
+            try {
+                const params = new URLSearchParams({
+                    action: "submitWasteLog",
+                    location: document.getElementById("wasteLocation").value,
+                    category: document.getElementById("wasteCategory").value,
+                    quantity: document.getElementById("wasteQuantity").value,
+                    notes: document.getElementById("wasteNotes").value,
+                    loggedBy: userName
+                });
+
+                const response = await fetch(APPS_SCRIPT_URL, {
+                    method: "POST",
+                    body: params
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showMessage(messageEl, "✅ Waste logged successfully!", "success");
+                    document.getElementById("wasteForm").reset();
+                    setTimeout(() => messageEl.classList.remove("message"), 3000);
+                } else {
+                    showMessage(messageEl, data.message, "error");
+                }
+            } catch (error) {
+                showMessage(messageEl, "Error: " + error.message, "error");
+            }
+        }
+
+        // TAB SWITCHING
+        function switchTab(tabName) {
+            if (tabName === "logout") {
+                document.getElementById("dashboard").classList.remove("active");
+                document.getElementById("loginForm").classList.add("active");
+                document.getElementById("email").value = "";
+                document.getElementById("code").value = "";
+                userEmail = "";
+                userName = "";
+                return;
+            }
+
+            document.querySelectorAll(".tab-content").forEach(tab => {
+                tab.classList.remove("active");
+            });
+
+            document.querySelectorAll(".tab-button").forEach(btn => {
+                btn.classList.remove("active");
+            });
+
+            document.getElementById(tabName).classList.add("active");
+            event.target.classList.add("active");
+        }
+
+        // UTILITY
+        function showMessage(element, message, type) {
+            element.textContent = message;
+            element.className = `message ${type}`;
+            element.style.display = "block";
+        }
+    </script>
+</body>
+</html>
