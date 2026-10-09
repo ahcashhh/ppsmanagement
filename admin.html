@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Peri Peri Shack - Manager Portal</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #DC143C;
+            --secondary: #2C2C2C;
+            --success: #28a745;
+            --error: #dc3545;
+            --warning: #ffc107;
+            --info: #17a2b8;
+            --light: #f8f9fa;
+            --dark: #343a40;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: linear-gradient(135deg, var(--secondary) 0%, #1a1a1a 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .login-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .login-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            padding: 40px;
+            max-width: 400px;
+            width: 100%;
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .login-logo {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+
+        .login-subtitle {
+            color: #666;
+            font-size: 0.95rem;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--secondary);
+        }
+
+        input[type="email"],
+        input[type="text"],
+        input[type="password"] {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        input[type="email"]:focus,
+        input[type="text"]:focus,
+        input[type="password"]:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(220, 20, 60, 0.1);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 1rem;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #b71230;
+        }
+
+        .btn-primary:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .message {
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+            display: block;
+        }
+
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+            display: block;
+        }
+
+        .hidden-field {
+            display: none;
+        }
+
+        /* Dashboard Styles */
+        .dashboard-wrapper {
+            display: none;
+        }
+
+        .dashboard-wrapper.active {
+            display: block;
+        }
+
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 280px;
+            height: 100vh;
+            background: var(--secondary);
+            color: white;
+            padding: 20px;
+            overflow-y: auto;
+            z-index: 1000;
+        }
+
+        .sidebar-header {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 30px;
+            color: var(--primary);
+        }
+
+        .nav-item {
+            padding: 12px 16px;
+            margin-bottom: 8px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.95rem;
+        }
+
+        .nav-item:hover {
+            background: rgba(220, 20, 60, 0.2);
+        }
+
+        .nav-item.active {
+            background: var(--primary);
+            font-weight: 600;
+        }
+
+        .nav-item.admin-only {
+            display: none;
+        }
+
+        .nav-item.admin-only.show {
+            display: block;
+        }
+
+        .main-content {
+            margin-left: 280px;
+            padding: 30px;
+        }
+
+        .header {
+            background: white;
+            padding: 20px 30px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-title {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--secondary);
+        }
+
+        .logout-btn {
+            background: var(--error);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .logout-btn:hover {
+            background: #c82333;
+        }
+
+        .content-section {
+            display: none;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .content-section.active {
+            display: block;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, var(--primary), #b71230);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: var(--secondary);
+        }
+
+        tr:hover {
+            background: #f8f9fa;
+        }
+    </style>
+</head>
+<body>
+
+<!-- LOGIN SECTION -->
+<div class="login-container" id="loginContainer">
+    <div class="login-card">
+        <div class="login-header">
+            <div class="login-logo">🌶️ Peri Peri Shack</div>
+            <div class="login-subtitle">Manager Portal</div>
+        </div>
+
+        <div class="message" id="loginMessage"></div>
+
+        <div class="form-group">
+            <label for="emailInput">Email Address</label>
+            <input type="email" id="emailInput" placeholder="akkash or manager@theperiperishack.com" onchange="handleEmailChange()" />
+        </div>
+
+        <div class="form-group" id="getCodeButtonGroup">
+            <button class="btn-primary" onclick="handleGetOTP()">Get Code</button>
+        </div>
+
+        <div class="form-group hidden-field" id="codeInputGroup">
+            <label for="codeInput">Verification Code</label>
+            <input type="text" id="codeInput" placeholder="Enter code from email or bypass code" />
+        </div>
+
+        <div class="form-group hidden-field" id="verifyCodeButtonGroup">
+            <button class="btn-primary" onclick="handleVerifyOTP()">Verify Code</button>
+        </div>
+    </div>
+</div>
+
+<!-- DASHBOARD SECTION -->
+<div class="dashboard-wrapper" id="dashboardWrapper">
+    <div class="sidebar">
+        <div class="sidebar-header">🌶️ Peri Peri Shack</div>
+        <div class="nav-item active" onclick="switchTab('dashboard')">Dashboard</div>
+        <div class="nav-item" onclick="switchTab('employees')">Employee Management</div>
+        <div class="nav-item admin-only" onclick="switchTab('stores')">Store Management</div>
+        <div class="nav-item admin-only" onclick="switchTab('codes')">Generate Codes</div>
+        <div class="nav-item admin-only" onclick="switchTab('reports')">Reports & Analytics</div>
+        <div class="nav-item admin-only" onclick="switchTab('users')">User Management</div>
+        <div class="nav-item admin-only" onclick="switchTab('settings')">Settings</div>
+        <div class="nav-item admin-only" onclick="switchTab('audit')">Audit Log</div>
+        <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.2);">
+            <div id="userInfo" style="color: #ccc; font-size: 0.85rem; margin-bottom: 15px;"></div>
+            <button class="logout-btn" onclick="handleLogout()" style="width: 100%;">Logout</button>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="header">
+            <div class="header-title" id="pageTitle">Dashboard</div>
+        </div>
+
+        <!-- Dashboard Tab -->
+        <div class="content-section active" id="dashboardTab">
+            <h2>Dashboard</h2>
+            <div class="stats-grid" id="statsContainer">
+                <div class="stat-card">
+                    <div class="stat-value" id="evalCount">0</div>
+                    <div class="stat-label">Evaluations</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="hoursCount">0</div>
+                    <div class="stat-label">Hours Saved</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="wasteCount">0</div>
+                    <div class="stat-label">Waste Logs</div>
+                </div>
+            </div>
+            <p id="storeInfo"></p>
+        </div>
+
+        <!-- Employees Tab -->
+        <div class="content-section" id="employeesTab">
+            <h2>Employee Management</h2>
+            <table id="employeeTable">
+                <thead>
+                    <tr>
+                        <th>Employee ID</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Role</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="employeeBody">
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Admin-Only Tabs (hidden for managers) -->
+        <div class="content-section" id="storesTab">
+            <h2>Store Management</h2>
+
+            <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 30px;">
+                <h3 style="margin-top: 0; color: #DC143C;">Add New Store</h3>
+
+                <div class="form-group">
+                    <label>Store Name</label>
+                    <input type="text" id="newStoreName" placeholder="e.g., Toronto" />
+                </div>
+
+                <div class="form-group">
+                    <label>Store ID</label>
+                    <input type="text" id="newStoreId" placeholder="e.g., STORE_TORONTO" />
+                    <small style="color: #666;">Use format: STORE_CITY (all caps)</small>
+                </div>
+
+                <div class="form-group">
+                    <label>Location Address</label>
+                    <input type="text" id="newStoreLocation" placeholder="e.g., 123 Main St, Toronto ON" />
+                </div>
+
+                <div class="form-group">
+                    <label>Manager Email</label>
+                    <input type="email" id="newStoreManagerEmail" placeholder="manager@theperiperishack.com" />
+                </div>
+
+                <button onclick="handleCreateNewStore()" style="background: #DC143C; color: white; padding: 12px 24px; border: none; border-radius: 6px; font-size: 1rem; cursor: pointer; font-weight: 600;">
+                    Create Store
+                </button>
+
+                <div id="createStoreMessage" style="margin-top: 15px; padding: 12px; border-radius: 6px; display: none;"></div>
+            </div>
+
+            <div style="background: white; padding: 20px; border-radius: 8px; border: 1px solid #ddd;">
+                <h3 style="margin-top: 0; color: #333;">Your Stores</h3>
+                <div id="storesList" style="display: grid; gap: 15px;"></div>
+            </div>
+        </div>
+
+        <div class="content-section" id="codesTab">
+            <h2>Generate Employee Codes</h2>
+            <p>Code generation interface for admins.</p>
+        </div>
+
+        <div class="content-section" id="reportsTab">
+            <h2>Reports & Analytics</h2>
+            <p>Analytics and reporting dashboard.</p>
+        </div>
+
+        <div class="content-section" id="usersTab">
+            <h2>User Management</h2>
+            <p>Manage admin and manager users.</p>
+        </div>
+
+        <div class="content-section" id="settingsTab">
+            <h2>Settings</h2>
+            <p>System settings and configuration.</p>
+        </div>
+
+        <div class="content-section" id="auditTab">
+            <h2>Audit Log</h2>
+            <p>Complete audit trail of all activities.</p>
+        </div>
+    </div>
+</div>
+
+<script>
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwN3bPPt706D6gLT7C8nEe9tzVdKgwPbj4Ga51IycdNlaqQthPw-EOp9HvahK65W-N1fw/exec";
+const ADMIN_BYPASS_CODE = "2337";
+const ADMIN_EMAIL = "akkash";
+
+let currentUser = {
+    email: null,
+    isAdmin: false,
+    storeId: null,
+    storeName: null,
+    sheetId: null
+};
+
+// ========== LOGIN FLOW ==========
+
+function handleEmailChange() {
+    const email = document.getElementById("emailInput").value.trim();
+    const getCodeGroup = document.getElementById("getCodeButtonGroup");
+    const codeInputGroup = document.getElementById("codeInputGroup");
+    const verifyCodeGroup = document.getElementById("verifyCodeButtonGroup");
+
+    if (email === ADMIN_EMAIL) {
+        // Admin bypass: show code input and verify directly
+        getCodeGroup.classList.add("hidden-field");
+        codeInputGroup.classList.remove("hidden-field");
+        verifyCodeGroup.classList.remove("hidden-field");
+        document.getElementById("codeInput").placeholder = "Enter bypass code (2337)";
+    } else if (email.endsWith("@theperiperishack.com")) {
+        // Manager: show get code button
+        getCodeGroup.classList.remove("hidden-field");
+        codeInputGroup.classList.add("hidden-field");
+        verifyCodeGroup.classList.add("hidden-field");
+        document.getElementById("codeInput").placeholder = "Enter code from email";
+    } else {
+        // Invalid email
+        getCodeGroup.classList.add("hidden-field");
+        codeInputGroup.classList.add("hidden-field");
+        verifyCodeGroup.classList.add("hidden-field");
+    }
+}
+
+function handleGetOTP() {
+    const email = document.getElementById("emailInput").value.trim();
+
+    if (!email.endsWith("@theperiperishack.com")) {
+        showMessage("Please enter a valid manager email", "error");
+        return;
+    }
+
+    fetch(APPS_SCRIPT_URL, {
+        method: "POST",
+        body: new URLSearchParams({
+            action: "sendOTP",
+            email: email
+        })
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.success) {
+            showMessage(`Code sent to ${email}`, "success");
+            document.getElementById("getCodeButtonGroup").classList.add("hidden-field");
+            document.getElementById("codeInputGroup").classList.remove("hidden-field");
+            document.getElementById("verifyCodeButtonGroup").classList.remove("hidden-field");
+        } else {
+            showMessage(data.message || "Failed to send code", "error");
+        }
+    })
+    .catch(err => showMessage("Error: " + err.message, "error"));
+}
+
+function handleVerifyOTP() {
+    const email = document.getElementById("emailInput").value.trim();
+    const code = document.getElementById("codeInput").value.trim();
+
+    if (!email || !code) {
+        showMessage("Please enter both email and code", "error");
+        return;
+    }
+
+    // Admin bypass
+    if (email === ADMIN_EMAIL && code === ADMIN_BYPASS_CODE) {
+        currentUser = {
+            email: email,
+            isAdmin: true,
+            storeId: null,
+            storeName: "System Admin",
+            sheetId: null
+        };
+        loadDashboard();
+        return;
+    }
+
+    // Manager OTP verification
+    fetch(APPS_SCRIPT_URL, {
+        method: "POST",
+        body: new URLSearchParams({
+            action: "verifyOTP",
+            email: email,
+            otp: code
+        })
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.success) {
+            currentUser = {
+                email: data.email,
+                isAdmin: false,
+                storeId: data.storeId,
+                storeName: data.storeName,
+                sheetId: data.sheetId
+            };
+            loadDashboard();
+        } else {
+            showMessage(data.message || "Invalid code", "error");
+        }
+    })
+    .catch(err => showMessage("Error: " + err.message, "error"));
+}
+
+function loadDashboard() {
+    document.getElementById("loginContainer").style.display = "none";
+    document.getElementById("dashboardWrapper").classList.add("active");
+    
+    // Show/hide admin tabs
+    const adminTabs = document.querySelectorAll(".nav-item.admin-only");
+    adminTabs.forEach(tab => {
+        if (currentUser.isAdmin) {
+            tab.classList.add("show");
+        } else {
+            tab.classList.remove("show");
+        }
+    });
+
+    // Update user info
+    document.getElementById("userInfo").textContent = `${currentUser.email}\n${currentUser.isAdmin ? "Admin" : "Manager"}`;
+    
+    // Load store data if manager
+    if (!currentUser.isAdmin) {
+        loadStoreData();
+    }
+
+    switchTab("dashboard");
+}
+
+function loadStoreData() {
+    // Load manager's store data
+    if (currentUser.sheetId) {
+        document.getElementById("storeInfo").innerHTML = `<strong>${currentUser.storeName}</strong><br>Store ID: ${currentUser.storeId}`;
+    }
+}
+
+function switchTab(tabName) {
+    document.querySelectorAll(".content-section").forEach(section => {
+        section.classList.remove("active");
+    });
+    document.querySelectorAll(".nav-item").forEach(item => {
+        item.classList.remove("active");
+    });
+
+    document.getElementById(tabName + "Tab").classList.add("active");
+    event.target.classList.add("active");
+
+    const titles = {
+        dashboard: "Dashboard",
+        employees: "Employee Management",
+        stores: "Store Management",
+        codes: "Generate Codes",
+        reports: "Reports & Analytics",
+        users: "User Management",
+        settings: "Settings",
+        audit: "Audit Log"
+    };
+    
+    document.getElementById("pageTitle").textContent = titles[tabName] || "Dashboard";
+}
+
+function handleLogout() {
+    currentUser = { email: null, isAdmin: false, storeId: null, storeName: null, sheetId: null };
+    document.getElementById("loginContainer").style.display = "flex";
+    document.getElementById("dashboardWrapper").classList.remove("active");
+    document.getElementById("emailInput").value = "";
+    document.getElementById("codeInput").value = "";
+    document.getElementById("loginMessage").className = "message";
+    handleEmailChange();
+}
+
+function showMessage(msg, type) {
+    const msgEl = document.getElementById("loginMessage");
+    msgEl.textContent = msg;
+    msgEl.className = "message " + type;
+    setTimeout(() => {
+        msgEl.className = "message";
+    }, 5000);
+}
+
+function handleCreateNewStore() {
+    const storeName = document.getElementById("newStoreName").value.trim();
+    const storeId = document.getElementById("newStoreId").value.trim();
+    const location = document.getElementById("newStoreLocation").value.trim();
+    const managerEmail = document.getElementById("newStoreManagerEmail").value.trim();
+
+    const msgEl = document.getElementById("createStoreMessage");
+
+    if (!storeName || !storeId || !location || !managerEmail) {
+        msgEl.textContent = "Please fill in all fields";
+        msgEl.className = "message error";
+        msgEl.style.display = "block";
+        return;
+    }
+
+    msgEl.textContent = "Creating store...";
+    msgEl.className = "message";
+    msgEl.style.display = "block";
+
+    fetch(APPS_SCRIPT_URL, {
+        method: "POST",
+        body: new URLSearchParams({
+            action: "createNewStore",
+            storeName: storeName,
+            storeId: storeId,
+            location: location,
+            managerEmail: managerEmail
+        })
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.success) {
+            msgEl.textContent = "✓ " + data.message;
+            msgEl.className = "message success";
+            document.getElementById("newStoreName").value = "";
+            document.getElementById("newStoreId").value = "";
+            document.getElementById("newStoreLocation").value = "";
+            document.getElementById("newStoreManagerEmail").value = "";
+            setTimeout(() => msgEl.style.display = "none", 3000);
+        } else {
+            msgEl.textContent = "Error: " + (data.message || "Unknown error");
+            msgEl.className = "message error";
+        }
+    })
+    .catch(err => {
+        msgEl.textContent = "Error: " + err.message;
+        msgEl.className = "message error";
+    });
+}
+
+// Initialize
+handleEmailChange();
+</script>
+
+</body>
+</html>
